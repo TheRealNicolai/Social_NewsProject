@@ -2,10 +2,13 @@ import time
 import tqdm
 import json
 
+william, bella, nicolai = 'pub_d9de26b5f5c540558489f00542c6366d', ' ', 'pub_2ffc1a6468d240ee80c80400eeea1c23'
+
 from newsdataapi import NewsDataApiClient
-api = NewsDataApiClient(apikey='pub_d9de26b5f5c540558489f00542c6366d')
+api = NewsDataApiClient(apikey=nicolai)
 
 # pub_d9de26b5f5c540558489f00542c6366d - Williams API
+# pub_2ffc1a6468d240ee80c80400eeea1c23 - Nicolai API
 
 all_articles = {}
 next_page = None
