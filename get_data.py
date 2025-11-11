@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from newsdataapi import NewsDataApiClient, newsdataapi_exception
 
-def get_new_articles(api_key, data_filename = None):
+def get_new_articles(api_key, data_filename = None, verbose=False):
     api = NewsDataApiClient(apikey=api_key)
 
     all_articles = {}
@@ -23,9 +23,11 @@ def get_new_articles(api_key, data_filename = None):
             response = api.news_api(language='en', max_result=1000, page=next_page)
         except newsdataapi_exception.NewsdataException:
             response = api.news_api(language='en', max_result=1000, page=None)
-            print('\nGetting page from new day.')
-        print()
-        print(f'Status: {response["status"]}')
+            if verbose:
+                print('\nGetting page from new day.')
+        if verbose:
+            print()
+            print(f'Status: {response["status"]}')
         next_page = response['nextPage']
         all_articles['nextPage'] = next_page
 
@@ -51,7 +53,7 @@ def get_new_articles(api_key, data_filename = None):
             if not missing_metadata and not already_processed and not duplicate_article and english:
                 article_relevant = {metadata : article[metadata] for metadata in metadata_list}
                 all_articles[id] = article_relevant
-            else:
+            elif verbose:
                 error_string = ""
                 if missing_metadata:
                     error_string = f"missing metadata {missing_metadata}"
@@ -63,18 +65,21 @@ def get_new_articles(api_key, data_filename = None):
                     error_string = "the article not being in english"
                 print(f'id: {id} not valid due to {error_string}.')
                 
-        print(f'Total results: {response["totalResults"]}')
-        print(f'Next page: {response["nextPage"]}')
-        print(f'Total articles so far: {len(all_articles)-1}')
+        if verbose:
+            print(f'Total results: {response["totalResults"]}')
+            print(f'Next page: {response["nextPage"]}')
+            print(f'Total articles so far: {len(all_articles)-1}')
         
         if len(all_articles) > start_n_articles:
             with open(data_filename, 'w') as f:
                 json.dump(all_articles, f)
                 
+    added_articles = len(all_articles) - start_n_articles
+    print(f'Added {added_articles} articles to dataset')
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print(f'End time: {formatted_time}')
             
 if __name__ == '__main__':
     william, bella, nicolai = 'pub_d9de26b5f5c540558489f00542c6366d', ' ', 'pub_2ffc1a6468d240ee80c80400eeea1c23'
     
-    get_new_articles(william, data_filename='newsdata.json')
+    get_new_articles(william, data_filename='newsdata.json', verbose=True)
