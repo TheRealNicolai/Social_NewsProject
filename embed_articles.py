@@ -1,10 +1,10 @@
 import json
 import pickle
-import tqdm
+from tqdm import tqdm
 
 from sentence_transformers import SentenceTransformer
 
-def embed_articles(input_filename = 'newsdata_p1.json', output_filename = 'embedded_articles.pkl', embedding_variables = ['description', 'title']):
+def embed_articles(input_filename = 'newsdata.json', embedding_variables = ['description', 'title']):
 
     model = SentenceTransformer('all-MiniLM-L6-v2')  # Fast, good balance
 
@@ -13,7 +13,7 @@ def embed_articles(input_filename = 'newsdata_p1.json', output_filename = 'embed
         
     embedded_articles = {}
     num_not_valid = 0
-    for id, article in tqdm.tqdm(all_articles.items()):
+    for id, article in tqdm(all_articles.items()):
         if id == 'nextPage':
             continue
         valid_article = True
@@ -32,7 +32,7 @@ def embed_articles(input_filename = 'newsdata_p1.json', output_filename = 'embed
     
 if __name__ == '__main__':
     embedding_variables = ['description', 'title']
-    input_filename = 'newsdata_p1.json'
+    input_filename = 'newsdata.json'
     output_filename = 'embedded_articles.pkl'
     embedded_articles, embedding_length, all_articles_length = embed_articles()
 

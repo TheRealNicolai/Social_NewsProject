@@ -1,51 +1,80 @@
 import time
-import tqdm
 import json
+from tqdm import tqdm
 
-from newsdataapi import NewsDataApiClient
+from newsdataapi import NewsDataApiClient, newsdataapi_exception
 
-def get_new_articles(api_key, current_data_file = None, output_data_file = None):
+def get_new_articles(api_key, data_filename = None):
     api = NewsDataApiClient(apikey=api_key)
 
     all_articles = {}
     next_page = None
 
-    if current_data_file:
-        with open(current_data_file, "r", encoding="utf-8") as f:
+    if data_filename:
+        with open(data_filename, "r", encoding="utf-8") as f:
             all_articles = json.load(f)
             next_page = all_articles['nextPage']
+    
+    start_n_articles = len(all_articles)
 
-    for i in tqdm.tqdm(range(30)):
+    for i in tqdm(range(30)):
         time.sleep(3)
-        response = api.news_api(language='en', max_result=1000, page=next_page)
+        try:
+            response = api.news_api(language='en', max_result=1000, page=next_page)
+        except newsdataapi_exception.NewsdataException:
+            response = api.news_api(language='en', max_result=1000, page=None)
+            print('\nGetting page from new day.')
         print()
-        print(f'Status: {response['status']}')
-        print(f'total results: {response['totalResults']}')
-        print(f'next page: {response['nextPage']}')
+        print(f'Status: {response["status"]}')
         next_page = response['nextPage']
         all_articles['nextPage'] = next_page
 
         for article in response['results']:
             id = article['article_id']
-            has_metadata = True
+            missing_metadata = False
             metadata_list = ['link', 'title', 'description', 'country', 'category', 'pubDate', 'source_id', 'source_name']
             for metadata in metadata_list:
                 if not article[metadata]:
-                    has_metadata = False
-                    break
-            if has_metadata and id not in all_articles and not article['duplicate'] and article['language'] == 'english':
+                    if not missing_metadata:
+                        missing_metadata = [metadata]
+                    else:
+                        missing_metadata.append(metadata)
+            already_processed = False
+            if not missing_metadata and id in all_articles:
+                already_processed = True
+            duplicate_article = False
+            if not missing_metadata and not already_processed and article['duplicate']:
+                duplicate_article = True
+            english = True
+            if not missing_metadata and not already_processed and not duplicate_article and article['language'] != 'english':
+                english = False
+            if not missing_metadata and not already_processed and not duplicate_article and english:
                 article_relevant = {metadata : article[metadata] for metadata in metadata_list}
                 all_articles[id] = article_relevant
             else:
-                print(f'id: {id} not valid.')
+                error_string = ""
+                if missing_metadata:
+                    error_string = f"missing metadata {missing_metadata}"
+                elif already_processed:
+                    error_string = "the article id already being processed"
+                elif duplicate_article:
+                    error_string = "the article being a duplicate"
+                elif not english:
+                    error_string = "the article not being in english"
+                print(f'id: {id} not valid due to {error_string}.')
                 
+        print(f'Total results: {response["totalResults"]}')
+        print(f'Next page: {response["nextPage"]}')
         print(f'Total articles so far: {len(all_articles)-1}')
         
-        if output_data_file:
-            with open(output_data_file, 'w') as f:
+        if len(all_articles) > start_n_articles:
+            with open(data_filename, 'w') as f:
                 json.dump(all_articles, f)
+                
+    formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    print(f'End time: {formatted_time}')
             
 if __name__ == '__main__':
     william, bella, nicolai = 'pub_d9de26b5f5c540558489f00542c6366d', ' ', 'pub_2ffc1a6468d240ee80c80400eeea1c23'
     
-    get_new_articles(william, current_data_file='newsdata_p1.json', output_data_file='newsdata_p2.json')
+    get_new_articles(william, data_filename='newsdata.json')
