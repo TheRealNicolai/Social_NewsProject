@@ -50,7 +50,10 @@ def get_new_articles(api_key, data_filename = None, verbose=False):
             english = True
             if not missing_metadata and not already_processed and not duplicate_article and article['language'] != 'english':
                 english = False
-            if not missing_metadata and not already_processed and not duplicate_article and english:
+            multiple_countries = False
+            if not missing_metadata and not already_processed and not duplicate_article and english and len(article['country']) != 1:
+                multiple_countries = True
+            if not missing_metadata and not already_processed and not duplicate_article and english and not multiple_countries:
                 article_relevant = {metadata : article[metadata] for metadata in metadata_list}
                 all_articles[id] = article_relevant
             elif verbose:
@@ -63,6 +66,8 @@ def get_new_articles(api_key, data_filename = None, verbose=False):
                     error_string = "the article being a duplicate"
                 elif not english:
                     error_string = "the article not being in english"
+                elif multiple_countries:
+                    error_string = "the article belonging to multiple countries"
                 print(f'id: {id} not valid due to {error_string}.')
                 
         if verbose:
