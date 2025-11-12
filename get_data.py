@@ -53,7 +53,10 @@ def get_new_articles(api_key, data_filename = None, verbose=False):
             multiple_countries = False
             if not missing_metadata and not already_processed and not duplicate_article and english and len(article['country']) != 1:
                 multiple_countries = True
-            if not missing_metadata and not already_processed and not duplicate_article and english and not multiple_countries:
+            country_is_world = False
+            if not missing_metadata and not already_processed and not duplicate_article and english and not multiple_countries and article['country'][0] == 'world':
+                country_is_world = True
+            if not missing_metadata and not already_processed and not duplicate_article and english and not multiple_countries and not country_is_world:
                 article_relevant = {metadata : article[metadata] for metadata in metadata_list}
                 all_articles[id] = article_relevant
             elif verbose:
@@ -68,6 +71,8 @@ def get_new_articles(api_key, data_filename = None, verbose=False):
                     error_string = "the article not being in english"
                 elif multiple_countries:
                     error_string = "the article belonging to multiple countries"
+                elif country_is_world:
+                    error_string = "the country being 'world'"
                 print(f'id: {id} not valid due to {error_string}.')
                 
         if verbose:
@@ -85,6 +90,6 @@ def get_new_articles(api_key, data_filename = None, verbose=False):
     print(f'End time: {formatted_time}')
             
 if __name__ == '__main__':
-    william, bella, nicolai = 'pub_d9de26b5f5c540558489f00542c6366d', ' ', 'pub_2ffc1a6468d240ee80c80400eeea1c23'
+    william, bella, nicolai = 'pub_d9de26b5f5c540558489f00542c6366d', 'pub_b17b6c07e5924b47a7266d5a23f43a33', 'pub_2ffc1a6468d240ee80c80400eeea1c23'
     
     get_new_articles(william, data_filename='newsdata.json', verbose=True)
