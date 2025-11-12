@@ -6,7 +6,7 @@ from sentence_transformers import SentenceTransformer
 
 def embed_articles(input_filename = 'newsdata.json', embedding_variables = ['description', 'title']):
 
-    model = SentenceTransformer('all-MiniLM-L6-v2')  # Fast, good balance
+    model = SentenceTransformer('all-MiniLM-L6-v2')  # Fast, good balance. 'multi-qa-MiniLM-L6-cos-v1' is another good option tuned for semantic search.
 
     with open(input_filename, "r", encoding="utf-8") as f:
         all_articles = json.load(f)
