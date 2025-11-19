@@ -1,3 +1,5 @@
 __pycache__/
 test.py
 clean_current_data.py
+cosine_similiarties_descriptions.pkl
+cosine_similiarties_titles.pkl
