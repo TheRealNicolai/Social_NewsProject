@@ -133,23 +133,23 @@ def main():
     print(f"{articles_description_no_emotions} article descriptions have no emotional words")
 
     # Save data
-    # with open("sentiments_title.json", "w") as f:
-    #     json.dump(sentiments_title, f)
+    with open("sentiments_title.json", "w") as f:
+        json.dump(sentiments_title, f)
 
-    # with open("sentiments_description.json", "w") as f:
-    #     json.dump(sentiments_description, f)
+    with open("sentiments_description.json", "w") as f:
+        json.dump(sentiments_description, f)
 
-    # with open("wl_title.json", "w") as f:
-    #     json.dump(wl_title, f)
+    with open("wl_title.json", "w") as f:
+        json.dump(wl_title, f)
 
-    # with open("wl_description.json", "w") as f:
-    #     json.dump(wl_description, f)
+    with open("wl_description.json", "w") as f:
+        json.dump(wl_description, f)
 
-    # with open("articles_title_emotions.json", "w") as f:
-    #     json.dump(articles_title_emotions, f)
+    with open("articles_title_emotions.json", "w") as f:
+        json.dump(articles_title_emotions, f)
 
-    # with open("articles_description_emotions.json", "w") as f:
-    #     json.dump(articles_description_emotions, f)
+    with open("articles_description_emotions.json", "w") as f:
+        json.dump(articles_description_emotions, f)
 
 if __name__=="__main__":
     main()
