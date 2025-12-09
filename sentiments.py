@@ -118,7 +118,7 @@ def count_emotional_words(all_articles: dict, wl: dict, title = True):
     else:
         return articles_description_emotions, articles_description_no_emotions
 
-def main():
+def sentiment_scores():
     # Load articles and 
     with open("newsdata.json", "r", encoding="utf-8") as f:
         all_articles = json.load(f)
@@ -126,13 +126,17 @@ def main():
 
     sentiments_title, sentiments_description, wl_title, wl_description = save_sentiment_scores(all_articles)
 
+    print('calculated sentiment score')
+
     articles_title_emotions, articles_title_no_emotions = count_emotional_words(all_articles, wl_title, title=True)
     articles_description_emotions, articles_description_no_emotions = count_emotional_words(all_articles, wl_description, title=False)
 
+    print('counted emotional words')
+    
     print(f"{articles_title_no_emotions} article titles have no emotional words")
     print(f"{articles_description_no_emotions} article descriptions have no emotional words")
 
-    # Save data
+    #Save data
     with open("sentiments_title.json", "w") as f:
         json.dump(sentiments_title, f)
 
@@ -150,6 +154,8 @@ def main():
 
     with open("articles_description_emotions.json", "w") as f:
         json.dump(articles_description_emotions, f)
+    
+    print('Saved data as json')
 
 if __name__=="__main__":
-    main()
+    sentiment_scores()
